@@ -1,6 +1,19 @@
 = map_reduced
 
-Description goes here.
+Easy templating for your MongoDB map_reduce runs.
+
+    class User
+      include MapReduced::Document
+  
+      map_reduce :count_followers, ...
+      functions  :find_thing
+    end
+
+    ## User.run_count_followers
+    # 
+    # => #<Mongo::Collection:0x00000100e17a50 @name="tmp.mr.mapreduce_1283030647_26", @db=#<Mongo::DB:0x00000100cbddb0 ......
+
+In this situation, you'd have a directory called "user" in your function templates path (defaults to "app/functions" in Rails, "./functions" elsewhere) with "count_followers_map.js.erb", "count_followers_reduce.js.erb", and "find_thing.js.erb". 
 
 == Note on Patches/Pull Requests
  
