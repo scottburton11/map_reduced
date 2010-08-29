@@ -1,7 +1,7 @@
 module MapReduced
   module Document
     module ClassMethods
-
+      @@added_functions = []
       def map_reduce(*names)
         names.each do |name|
           self.class_eval %Q{            
@@ -25,6 +25,10 @@ module MapReduced
         db.collection(collection_name)
       end
 
+      def use_functions(*names)
+        @@added_functions = names
+      end
+
       private
 
       def collection_name
@@ -43,18 +47,14 @@ module MapReduced
         function_string("#{function}_reduce")
       end
 
-      def functions(*names)
-        @@functions = names
-      end
-
       def setup_functions
-        @@functions.each do |function_name|
+        @@added_functions.each do |function_name|
           db.add_stored_function(function_name.to_s, function_string(function_name))
         end
       end
 
       def teardown_functions
-        @@functions.each {|name| db.remove_stored_function(name.to_s)}
+        @@added_functions.each {|name| db.remove_stored_function(name.to_s)}
       end
 
       def function_string(name)
@@ -72,9 +72,6 @@ module MapReduced
     end
 
     def self.included(receiver)
-      receiver.class_eval %Q{
-        @@functions = []
-      }
       receiver.extend         ClassMethods
       receiver.send :include, InstanceMethods
     end
