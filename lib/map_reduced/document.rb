@@ -5,10 +5,10 @@ module MapReduced
       def map_reduce(*names)
         names.each do |name|
           self.class_eval %Q{            
-            def self.run_#{name}
+            def self.run_#{name}(opts = {})
               begin
                 setup_functions
-                collection.map_reduce(map("#{name}"), reduce("#{name}"))
+                collection.map_reduce(map("#{name}"), reduce("#{name}"), opts)
               ensure
                 teardown_functions
               end
