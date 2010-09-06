@@ -1,7 +1,6 @@
 module MapReduced
   module Document
     module ClassMethods
-      @added_functions = []
       def map_reduce(*names)
         names.each do |name|
           self.class_eval %Q{            
@@ -25,18 +24,22 @@ module MapReduced
         db.collection(collection_name)
       end
 
+      def collection_name=(name)
+        @collection_name = name
+      end
+      
       def use_functions(*names)
         @added_functions = names
       end
 
       private
 
-      def collection_name
-        "#{self.to_s.downcase}s"
+      def added_functions
+        @added_functions ||= []
       end
-      
-      def collection_name=(name)
-        @collection_name = name
+
+      def collection_name
+        @collection_name ||= "#{self.to_s.downcase}s"
       end
       
       def map(function)
@@ -48,13 +51,13 @@ module MapReduced
       end
 
       def setup_functions
-        @added_functions.each do |function_name|
+        added_functions.each do |function_name|
           db.add_stored_function(function_name.to_s, function_string(function_name))
         end
       end
 
       def teardown_functions
-        @added_functions.each {|name| db.remove_stored_function(name.to_s)}
+        added_functions.each {|name| db.remove_stored_function(name.to_s)}
       end
 
       def function_string(name)

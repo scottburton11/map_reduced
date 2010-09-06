@@ -3,10 +3,14 @@ module MapReduced
     class << self
 
       attr_writer :template_path
-      attr_reader :db
       
-      def database(string)
+      def database=(string)
         @db = Mongo::Connection.new.db(string)
+      end
+      
+      def db
+        warn "Tell MapReduced which database to use, like this:\nMapReduced::Config.database = 'my_awesome_database'" unless defined? @db
+        @db
       end
       
       def template_path
