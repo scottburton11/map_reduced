@@ -2,11 +2,14 @@
 
 Easy templating for your MongoDB map_reduce runs.
 
+    MapReduced::Config.database = 'my_database_name'
+    MapReduced::Config.template_path = 'some/path/where/I/like/templates/to/go'
+
     class User
       include MapReduced::Document
   
       map_reduce :count_followers, ...
-      functions  :find_thing
+      use_functions  :find_thing
     end
 
     ## User.run_count_followers
