@@ -1,6 +1,7 @@
 module MapReduced
   module Document
     module ClassMethods
+      attr_reader :receiver_binding
       def map_reduce(*names)
         names.each do |name|
           self.class_eval %Q{            
@@ -62,7 +63,7 @@ module MapReduced
 
       def function_string(name)
         template = File.read(path_to_function(name)).gsub(/[\n\t\s]+/, " ")
-        ERB.new(template).result(binding)
+        ERB.new(template).result(receiver_binding)
       end
 
       def path_to_function(function)
@@ -77,6 +78,7 @@ module MapReduced
     def self.included(receiver)
       receiver.extend         ClassMethods
       receiver.send :include, InstanceMethods
+      receiver.instance_variable_set(:@receiver_binding, receiver.send(:binding))
     end
   end
 end
