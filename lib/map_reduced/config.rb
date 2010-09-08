@@ -10,8 +10,10 @@ module MapReduced
             uri = URI.parse(string)
             connection = Mongo::Connection.new(uri.host, uri.port)
             database = uri.path.gsub(/^\//, "")
-            connection.add_auth(database, uri.user, uri.password)
-            connection.apply_saved_authentication
+            if uri.user && uri.password
+              connection.add_auth(database, uri.user, uri.password) 
+              connection.apply_saved_authentication
+            end
             @db = connection.db(database)
           else
             @db = Mongo::Connection.new.db(string)
