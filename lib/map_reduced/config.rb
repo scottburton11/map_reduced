@@ -5,7 +5,21 @@ module MapReduced
       attr_writer :template_path
       
       def database=(string)
-        @db = Mongo::Connection.new.db(string)
+        begin
+          if string.match /^.+\:\/\/.+/
+            uri = URI.parse(string)
+            connection = Mongo::Connection.new(uri.host, uri.port)
+            database = uri.path.gsub(/^\//, "")
+            connection.add_auth(database, uri.user, uri.password)
+            connection.apply_saved_authentication
+            @db = connection.db(database)
+          else
+            @db = Mongo::Connection.new.db(string)
+          end
+        rescue Mongo::ConnectionFailure => e
+          raise Mongo::ConnectionFailure, "#{e}\nIt is possible that your database string is badly formed.\nIt should either be a database name (for localhost connections), or a fully-formed remote connection like mongodb://user:pass@host:port/database"
+        end
+        
       end
       
       def db
